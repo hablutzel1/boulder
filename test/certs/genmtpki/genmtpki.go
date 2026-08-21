@@ -112,6 +112,22 @@ func main2() error {
 		return err
 	}
 
+	caSPKI, err := x509.MarshalPKIXPublicKey(key.PublicKey())
+	if err != nil {
+		return err
+	}
+
+	caPubFile, err := os.OpenFile(basepath+".pub.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer caPubFile.Close()
+
+	err = pem.Encode(caPubFile, &pem.Block{Type: "PUBLIC KEY", Bytes: caSPKI})
+	if err != nil {
+		return err
+	}
+
 	mirrorKey, err := mldsa.GenerateKey(mldsa.MLDSA44())
 	if err != nil {
 		return err
